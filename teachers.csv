@@ -1,0 +1,26 @@
+Teacher_ID,Name,Instruments,Max_Hours_Per_Week
+T001,Jack Hunter,"['Violin', 'Drums']",11
+T002,Kayla Peck,['Guitar'],8
+T003,Karen Snyder,['Piano'],12
+T004,Rodney Briggs,['Drums'],9
+T005,Thomas Nguyen,"['Guitar', 'Drums', 'Piano']",11
+T006,Jason Lopez,"['Drums', 'Violin']",14
+T007,David Stone,"['Violin', 'Guitar']",7
+T008,Oscar Ramirez,"['Piano', 'Violin']",11
+T009,Katherine Barber,['Piano'],12
+T010,George Wade,"['Piano', 'Violin']",9
+T011,Kristopher Floyd,"['Drums', 'Violin']",8
+T012,Elizabeth Cooper,"['Guitar', 'Drums', 'Violin']",12
+T013,Ann Ruiz,"['Guitar', 'Piano']",12
+T014,Alan Ross,"['Violin', 'Drums']",7
+T015,Tyrone Tucker,"['Drums', 'Violin']",10
+T016,Stephanie Pennington,['Guitar'],9
+T017,Megan Giles,"['Piano', 'Violin', 'Guitar']",6
+T018,Paula Houston,"['Drums', 'Violin']",12
+T019,Haley Paul,"['Drums', 'Guitar']",10
+T020,Kenneth Castro,"['Guitar', 'Piano', 'Violin']",6
+T021,Jacob Williams,"['Piano', 'Guitar', 'Drums']",9
+T022,Jared Page,"['Piano', 'Drums', 'Guitar']",5
+T023,Adam Malone,"['Guitar', 'Drums', 'Piano']",14
+T024,David Estes,"['Drums', 'Guitar', 'Violin']",10
+T025,Heather Rodriguez,"['Guitar', 'Violin']",13
