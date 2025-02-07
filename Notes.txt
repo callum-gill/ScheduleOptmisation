@@ -1,0 +1,27 @@
+﻿https://stable-baselines3.readthedocs.io/en/master/
+
+Key Improvements:
+
+✅ Higher Episode Reward (ep_rew_mean: 955)
+
+    Your model is now finding better schedules compared to the massive negative rewards from before.
+
+✅ More Stable Loss (loss: -0.0864)
+
+    Previously, your value loss was in the thousands, now it’s much lower, which suggests better convergence.
+
+Potential Issues & Tweaks:
+
+⚠️ High Approx KL (approx_kl: 0.434)
+
+    This means the policy is changing a lot between updates, which could be unstable. Try lowering learning_rate to 0.0003 or 0.0001 to stabilise updates.
+
+⚠️ Explained Variance (explained_variance: -0.161)
+
+    This measures how well the value function explains returns. A negative value means it's performing worse than random guessing.
+    Fix: Increase n_steps (e.g., n_steps=2048) so it learns from longer trajectories.
+
+⚠️ High Clipping (clip_fraction: 0.843)
+
+    Almost all policy updates are hitting the clipping range (clip_range: 0.2), meaning your policy might be changing too aggressively.
+    Fix: Try lowering clip_range to 0.1 for more stable updates.

@@ -16,10 +16,14 @@ def main():
     env = SchedulingEnv(teachers, students, rooms)
     vec_env = make_vec_env(lambda: env, n_envs=1)
 
-    model = PPO("MultiInputPolicy", vec_env, verbose=1, device="auto")
+    model = PPO("MultiInputPolicy", vec_env, verbose=1, device="auto",
+                learning_rate=0.001,
+                gamma=0.99,
+                n_steps=1024,
+                ent_coef=0.01) # Encourage exploration
 
     # Adjust time-steps for better results but longer training time
-    model.learn(total_timesteps=10000)
+    model.learn(total_timesteps=100000)
 
     model.save("scheduling_rl_model")
 
