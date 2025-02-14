@@ -1,27 +1,46 @@
-﻿https://stable-baselines3.readthedocs.io/en/master/
+﻿👍 Positive Signs
 
-Key Improvements:
+✅ High Episode Reward (ep_rew_mean = 955)
 
-✅ Higher Episode Reward (ep_rew_mean: 955)
+    Your agent is achieving relatively high rewards on average.
+    This suggests it is learning some useful scheduling strategies.
 
-    Your model is now finding better schedules compared to the massive negative rewards from before.
+✅ Training Speed (fps = 249)
 
-✅ More Stable Loss (loss: -0.0864)
+    The model is running efficiently.
 
-    Previously, your value loss was in the thousands, now it’s much lower, which suggests better convergence.
+⚠ Areas for Improvement
 
-Potential Issues & Tweaks:
+🔸 approx_kl = 0.446 (Too High!)
 
-⚠️ High Approx KL (approx_kl: 0.434)
+    The KL divergence measures how much the new policy diverges from the old one.
+    High KL means the policy is changing too aggressively, which can cause instability.
+    Fix: Reduce learning_rate or increase clip_range slightly.
 
-    This means the policy is changing a lot between updates, which could be unstable. Try lowering learning_rate to 0.0003 or 0.0001 to stabilise updates.
+🔸 clip_fraction = 0.797 (Too High!)
 
-⚠️ Explained Variance (explained_variance: -0.161)
+    Nearly 80% of updates are being clipped, meaning the optimizer is rejecting many updates.
+    Fix: Lower the learning_rate to prevent extreme policy updates.
 
-    This measures how well the value function explains returns. A negative value means it's performing worse than random guessing.
-    Fix: Increase n_steps (e.g., n_steps=2048) so it learns from longer trajectories.
+🔸 explained_variance = -0.872 (Very Poor!)
 
-⚠️ High Clipping (clip_fraction: 0.843)
+    This measures how well the value function explains variance in returns.
+    Negative values mean the value function is basically random.
+    Fix:
+        Check if the reward function is well-shaped.
+        Normalize rewards if needed.
+        Increase the model complexity (more training steps).
 
-    Almost all policy updates are hitting the clipping range (clip_range: 0.2), meaning your policy might be changing too aggressively.
-    Fix: Try lowering clip_range to 0.1 for more stable updates.
+🔸 Entropy Loss (entropy_loss = -16.9)
+
+    Entropy loss controls exploration. Lower values mean less exploration.
+    Fix: Try increasing entropy_coef to encourage exploration.
+
+🔧 Suggested Fixes
+
+1️⃣ Reduce learning rate (learning_rate = 0.0005 or 0.0003)
+2️⃣ Increase clip_range slightly (clip_range = 0.25)
+3️⃣ Normalize rewards (reward = reward / max_possible_reward)
+4️⃣ Train longer and monitor explained variance
+
+Your model is on the right track—just needs some fine-tuning! 🚀

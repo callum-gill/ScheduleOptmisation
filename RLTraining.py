@@ -1,8 +1,8 @@
 import pandas as pd
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
-
 from RLModel import SchedulingEnv
+from TrainingLogger import TrainingLoggerCallback
 
 
 def main():
@@ -20,11 +20,14 @@ def main():
                 learning_rate=0.001,
                 gamma=0.99,
                 n_steps=1024,
-                ent_coef=0.01) # Encourage exploration
+                clip_range=0.2,
+                ent_coef=0.01)  # Encourage exploration
 
-    # Adjust time-steps for better results but longer training time
-    model.learn(total_timesteps=100000)
+    # Train model with logging
+    log_callback = TrainingLoggerCallback(log_dir="training_logs.csv")
+    model.learn(total_timesteps=100000, callback=log_callback)
 
+    # Save model
     model.save("scheduling_rl_model")
 
 
