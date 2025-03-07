@@ -17,11 +17,11 @@ def main():
     vec_env = make_vec_env(lambda: env, n_envs=1)
 
     model = PPO("MultiInputPolicy", vec_env, verbose=1, device="auto",
-                learning_rate=0.001,
-                gamma=0.99,
-                n_steps=1024,
-                clip_range=0.2,
-                ent_coef=0.01)  # Encourage exploration
+                learning_rate=0.0019925927837035782,
+                gamma=0.9337795997422365,
+                n_steps=4096,
+                clip_range=0.13743343485858267,
+                ent_coef=0.09460087314234743)  # Encourage exploration
 
     # Train model with logging
     log_callback = TrainingLoggerCallback(log_dir="training_logs.csv")
