@@ -14,9 +14,9 @@ rooms = pd.read_csv("rooms.csv")
 # Define the objective function for Bayesian Optimization
 def objective(trial):
     learning_rate = trial.suggest_float("learning_rate", 1e-5, 1e-2, log=True)
-    gamma = trial.suggest_float("gamma", 0.9, 0.999)  # Updated from suggest_uniform
+    gamma = trial.suggest_float("gamma", 0.1, 0.999)  # Updated from suggest_uniform
     n_steps = trial.suggest_int("n_steps", 512, 4096, step=512)
-    clip_range = trial.suggest_float("clip_range", 0.1, 0.3)  # Updated from suggest_uniform
+    clip_range = trial.suggest_float("clip_range", 0.1, 0.9)  # Updated from suggest_uniform
     ent_coef = trial.suggest_float("ent_coef", 1e-4, 0.1, log=True)  # Updated from suggest_loguniform
 
     # Create environment

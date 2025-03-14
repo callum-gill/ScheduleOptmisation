@@ -1,0 +1,26 @@
+Teacher_ID,Name,Instruments,Max_Hours_Per_Week
+T001,Jennifer Thomas,"['Piano', 'Drums']",11
+T002,Victor Hamilton,"['Guitar', 'Violin']",8
+T003,Christopher Young,"['Guitar', 'Drums']",12
+T004,Alan Moreno,['Violin'],9
+T005,Brenda Hudson,"['Drums', 'Piano']",11
+T006,John Mercer,"['Guitar', 'Piano', 'Drums']",14
+T007,Bradley Palmer,['Piano'],7
+T008,James Nguyen,"['Piano', 'Guitar', 'Violin']",11
+T009,Kristen Curtis,"['Piano', 'Guitar']",12
+T010,Angela Copeland,"['Piano', 'Guitar', 'Violin']",9
+T011,Daniel Parker,"['Guitar', 'Violin', 'Drums']",8
+T012,Tammy Wilson,"['Violin', 'Piano', 'Drums']",12
+T013,Charles Fisher,['Violin'],12
+T014,Jordan Sherman,"['Piano', 'Guitar', 'Drums']",7
+T015,Emily Wallace,['Drums'],10
+T016,Marcus Burton,"['Violin', 'Drums']",9
+T017,Keith Powell,"['Guitar', 'Drums', 'Violin']",6
+T018,Marcus Lopez,"['Violin', 'Guitar']",12
+T019,Donald Whitaker,['Drums'],10
+T020,Lynn Ramos,"['Piano', 'Drums', 'Violin']",6
+T021,Lori Montoya,['Guitar'],9
+T022,Christine Todd,"['Drums', 'Piano', 'Guitar']",5
+T023,Michelle Miller,"['Piano', 'Guitar', 'Violin']",14
+T024,Thomas Cardenas,"['Drums', 'Piano']",10
+T025,Kristen Sanchez,['Guitar'],13
