@@ -12,7 +12,7 @@ def test_model():
 
     # Initialize test environment
     test_env = SchedulingEnv(teachers, students, rooms)
-    vec_test_env = make_vec_env(lambda: test_env, n_envs=1)
+    vec_test_env = make_vec_env(lambda: test_env, n_envs=4)
 
     # Load trained model
     print("Loading trained model...")
@@ -20,15 +20,15 @@ def test_model():
 
     # Run inference
     obs = vec_test_env.reset()
-    done = False
     schedule = []
 
     print("Generating schedule...")
-    while not done:
-        action, _states = model.predict(obs, deterministic=True)  # Predict best action
-        obs, rewards, dones, info = vec_test_env.step(action)  # Step through env
-        schedule.append(info)  # Store results
-        done = dones[0]  # Assuming single environment
+    done = [False]  # Use a list for vectorized env
+    while not all(done):  # Wait for all environments to finish
+        action, _states = model.predict(obs, deterministic=True)  # Predict multiple actions at once
+        obs, rewards, dones, info = vec_test_env.step(action)  # Step through all envs
+        schedule.extend(info)  # Append batch results
+        done = dones  # Update completion status
 
     # Print or save schedule
     print("Generated Schedule:", schedule)

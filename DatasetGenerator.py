@@ -11,8 +11,8 @@ def generate_test_data():
 
     # Parameters
     number_teachers = 25
-    number_students = 500
-    number_rooms = 20
+    number_students = 1000
+    number_rooms = 25
     number_lessons = 20
     lesson_durations = [30, 60]
     time_slots = pd.date_range("2025-01-01 8:00", "2025-05-01 17:00", freq="30min")
