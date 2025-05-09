@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from faker import Faker
 import random
+from config import MAX_TEACHERS, MAX_ROOMS, MAX_STUDENTS, TIME_SLOTS
 
 
 def generate_test_data():
@@ -10,12 +11,16 @@ def generate_test_data():
     np.random.seed(42)
 
     # Parameters
-    number_teachers = 25
-    number_students = 1000
-    number_rooms = 25
+    number_teachers = random.randint(10, MAX_TEACHERS)
+    number_students = random.randint(10, MAX_STUDENTS)
+    number_rooms = random.randint(5, MAX_ROOMS)
     number_lessons = 20
     lesson_durations = [30, 60]
-    time_slots = pd.date_range("2025-01-01 8:00", "2025-05-01 17:00", freq="30min")
+    # Generate all possible time slots
+    all_time_slots = pd.date_range("2025-01-01 08:00", "2025-05-01 17:00", freq="30min")
+
+    # Restrict to the first `TIME_SLOTS` entries
+    time_slots = all_time_slots[:TIME_SLOTS]
 
     # Generate Teachers
     teachers = pd.DataFrame({
@@ -85,12 +90,16 @@ def generate_train_data():
     np.random.seed(42)
 
     # Parameters
-    number_teachers = 25
-    number_students = 1000
-    number_rooms = 25
+    number_teachers = random.randint(10, MAX_TEACHERS)
+    number_students = random.randint(10, MAX_STUDENTS)
+    number_rooms = random.randint(5, MAX_ROOMS)
     number_lessons = 20
     lesson_durations = [30, 60]
-    time_slots = pd.date_range("2025-01-01 8:00", "2025-05-01 17:00", freq="30min")
+    # Generate all possible time slots
+    all_time_slots = pd.date_range("2025-01-01 08:00", "2025-05-01 17:00", freq="30min")
+
+    # Restrict to the first `TIME_SLOTS` entries
+    time_slots = all_time_slots[:TIME_SLOTS]
 
     # Generate Teachers
     teachers = pd.DataFrame({

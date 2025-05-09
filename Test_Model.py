@@ -1,39 +1,50 @@
 ﻿import pandas as pd
 from stable_baselines3 import PPO
-from stable_baselines3.common.env_util import make_vec_env
+from stable_baselines3.common.vec_env import DummyVecEnv
 from RLModel import SchedulingEnv
 
+
 def test_model():
-    # Load unseen test dataset
     print("Loading test datasets...")
-    teachers = pd.read_csv("teachers_test.csv")  # Unseen teachers
-    students = pd.read_csv("students_test.csv")  # Unseen students
-    rooms = pd.read_csv("rooms_test.csv")        # Unseen rooms
+    teachers = pd.read_csv("teachers_test.csv")
+    students = pd.read_csv("students_test.csv")
+    rooms = pd.read_csv("rooms_test.csv")
 
-    # Initialize test environment
-    test_env = SchedulingEnv(teachers, students, rooms)
-    vec_test_env = make_vec_env(lambda: test_env, n_envs=4)
+    print("Initializing test environment...")
 
-    # Load trained model
+    def make_env():
+        return SchedulingEnv(teachers, students, rooms)
+
+    test_env = DummyVecEnv([make_env])
+
     print("Loading trained model...")
     model = PPO.load("scheduling_rl_model")
 
-    # Run inference
-    obs = vec_test_env.reset()
+    obs = test_env.reset()
     schedule = []
 
     print("Generating schedule...")
-    done = [False]  # Use a list for vectorized env
-    while not all(done):  # Wait for all environments to finish
-        action, _states = model.predict(obs, deterministic=True)  # Predict multiple actions at once
-        obs, rewards, dones, info = vec_test_env.step(action)  # Step through all envs
-        schedule.extend(info)  # Append batch results
-        done = dones  # Update completion status
+    done = [False]
+    while not all(done):
+        action, _ = model.predict(obs, deterministic=True)
+        obs, reward, done, info = test_env.step(action)
 
-    # Print or save schedule
+        print(f"Action taken: {action}")
+        print(f"Reward: {reward}")
+        print(f"Done: {done}")
+        print(f"Info: {info}")
+
+        if isinstance(info, list) and "schedule" in info[0]:
+            schedule.extend(info[0]["schedule"])
+
+    # Save schedule
     print("Generated Schedule:", schedule)
-    pd.DataFrame(schedule).to_csv("generated_schedule.csv", index=False)
-    print("Schedule saved to generated_schedule.csv")
+    if schedule:
+        pd.DataFrame(schedule).to_csv("generated_schedule.csv", index=False)
+        print("Schedule saved to generated_schedule.csv")
+    else:
+        print("No valid schedule was generated.")
+
 
 if __name__ == '__main__':
     test_model()

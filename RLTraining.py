@@ -16,7 +16,7 @@ def main():
     env = SchedulingEnv(teachers, students, rooms)
     vec_env = make_vec_env(lambda: env, n_envs=1)
 
-    model = PPO("MultiInputPolicy", vec_env, verbose=1, device="auto",
+    model = PPO("MlpPolicy", vec_env, verbose=1, device="auto",
                 learning_rate=0.009532797821928342,
                 gamma=0.9714174390463426,
                 n_steps=4096,
