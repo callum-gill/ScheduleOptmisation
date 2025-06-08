@@ -1,6 +1,5 @@
 import pandas as pd
 from stable_baselines3 import PPO
-from stable_baselines3.common.env_util import make_vec_env
 from RLModel import SchedulingEnv
 from TrainingLogger import TrainingLoggerCallback
 
@@ -14,14 +13,17 @@ def main():
 
     print("Setting up model...")
     env = SchedulingEnv(teachers, students, rooms)
-    vec_env = make_vec_env(lambda: env, n_envs=1)
 
-    model = PPO("MlpPolicy", vec_env, verbose=1, device="auto",
-                learning_rate=0.009532797821928342,
-                gamma=0.9714174390463426,
-                n_steps=4096,
-                clip_range=0.8973883616872791,
-                ent_coef=0.00010841606232106418)  # Encourage exploration
+    model = PPO(
+        "MlpPolicy", env,
+        verbose=1,
+        device="auto",
+        learning_rate=1e-4,
+        gamma=0.99,
+        n_steps=2048,
+        clip_range=0.2,
+        ent_coef=0.05
+    )
 
     # Train model with logging
     log_callback = TrainingLoggerCallback(log_dir="training_logs.csv")

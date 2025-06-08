@@ -11,9 +11,9 @@ def generate_test_data():
     np.random.seed(42)
 
     # Parameters
-    number_teachers = random.randint(10, MAX_TEACHERS)
-    number_students = random.randint(10, MAX_STUDENTS)
-    number_rooms = random.randint(5, MAX_ROOMS)
+    number_teachers = random.randint(1, MAX_TEACHERS)
+    number_students = random.randint(1, MAX_STUDENTS)
+    number_rooms = random.randint(1, MAX_ROOMS)
     number_lessons = 20
     lesson_durations = [30, 60]
     # Generate all possible time slots
@@ -25,7 +25,6 @@ def generate_test_data():
     # Generate Teachers
     teachers = pd.DataFrame({
         "Teacher_ID": [f"T{i:03d}" for i in range(1, number_teachers + 1)],
-        "Name": [fake.name() for _ in range(number_teachers)],
         "Instruments": [random.sample(["Piano", "Guitar", "Violin", "Drums"], k=random.randint(1, 3)) for _ in
                         range(number_teachers)],
         "Max_Hours_Per_Week": np.random.randint(5, 15, number_teachers)
@@ -34,7 +33,6 @@ def generate_test_data():
     # Generate Students
     students = pd.DataFrame({
         "Student_ID": [f"S{i:03d}" for i in range(1, number_students + 1)],
-        "Name": [fake.name() for _ in range(number_students)],
         "Preferred_Times": [random.sample(time_slots.strftime("%H:%M").tolist(), k=5) for _ in range(number_students)],
         "Instrument": [random.choice(["Piano", "Guitar", "Violin", "Drums"]) for _ in range(number_students)],
         "Skill_Level": [random.choice(["Beginner", "Intermediate", "Advanced"]) for _ in range(number_students)],
@@ -90,9 +88,9 @@ def generate_train_data():
     np.random.seed(42)
 
     # Parameters
-    number_teachers = random.randint(10, MAX_TEACHERS)
-    number_students = random.randint(10, MAX_STUDENTS)
-    number_rooms = random.randint(5, MAX_ROOMS)
+    number_teachers = random.randint(1, MAX_TEACHERS)
+    number_students = random.randint(1, MAX_STUDENTS)
+    number_rooms = random.randint(1, MAX_ROOMS)
     number_lessons = 20
     lesson_durations = [30, 60]
     # Generate all possible time slots
@@ -104,7 +102,6 @@ def generate_train_data():
     # Generate Teachers
     teachers = pd.DataFrame({
         "Teacher_ID": [f"T{i:03d}" for i in range(1, number_teachers + 1)],
-        "Name": [fake.name() for _ in range(number_teachers)],
         "Instruments": [random.sample(["Piano", "Guitar", "Violin", "Drums"], k=random.randint(1, 3)) for _ in
                         range(number_teachers)],
         "Max_Hours_Per_Week": np.random.randint(5, 15, number_teachers)
@@ -113,7 +110,6 @@ def generate_train_data():
     # Generate Students
     students = pd.DataFrame({
         "Student_ID": [f"S{i:03d}" for i in range(1, number_students + 1)],
-        "Name": [fake.name() for _ in range(number_students)],
         "Preferred_Times": [random.sample(time_slots.strftime("%H:%M").tolist(), k=5) for _ in range(number_students)],
         "Instrument": [random.choice(["Piano", "Guitar", "Violin", "Drums"]) for _ in range(number_students)],
         "Skill_Level": [random.choice(["Beginner", "Intermediate", "Advanced"]) for _ in range(number_students)],

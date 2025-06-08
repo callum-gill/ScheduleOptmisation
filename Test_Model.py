@@ -1,49 +1,58 @@
 ﻿import pandas as pd
 from stable_baselines3 import PPO
-from stable_baselines3.common.vec_env import DummyVecEnv
 from RLModel import SchedulingEnv
 
 
 def test_model():
     print("Loading test datasets...")
-    teachers = pd.read_csv("teachers_test.csv")
-    students = pd.read_csv("students_test.csv")
-    rooms = pd.read_csv("rooms_test.csv")
+    teachers = pd.read_csv("teachers.csv")
+    students = pd.read_csv("students.csv")
+    rooms = pd.read_csv("rooms.csv")
 
     print("Initializing test environment...")
-
-    def make_env():
-        return SchedulingEnv(teachers, students, rooms)
-
-    test_env = DummyVecEnv([make_env])
+    test_env = SchedulingEnv(teachers, students, rooms)
 
     print("Loading trained model...")
     model = PPO.load("scheduling_rl_model")
 
-    obs = test_env.reset()
+    obs, _ = test_env.reset()
     schedule = []
 
     print("Generating schedule...")
-    done = [False]
-    while not all(done):
-        action, _ = model.predict(obs, deterministic=True)
-        obs, reward, done, info = test_env.step(action)
+    done = False
 
+    while not done:
+        action, _ = model.predict(obs, deterministic=True)
+
+        decoded = test_env.decode_action(action)
+        print("Decoded action:", decoded)
+
+        obs, reward, done, truncated, info = test_env.step(action)
+
+        print(f"\n--- Step Log ---")
         print(f"Action taken: {action}")
         print(f"Reward: {reward}")
         print(f"Done: {done}")
         print(f"Info: {info}")
 
-        if isinstance(info, list) and "schedule" in info[0]:
-            schedule.extend(info[0]["schedule"])
+        if info.get("new_lesson") is not None and "error" not in info:
+            schedule.append(info["new_lesson"])
+            print(f"Scheduled: {info['new_lesson']}")
 
-    # Save schedule
-    print("Generated Schedule:", schedule)
+        if "error" in info:
+            print("Error from env:", info["error"])
+
+    print("\nGenerated Schedule:")
+    for entry in schedule:
+        print(entry)
+
     if schedule:
+        print(schedule)
         pd.DataFrame(schedule).to_csv("generated_schedule.csv", index=False)
         print("Schedule saved to generated_schedule.csv")
     else:
-        print("No valid schedule was generated.")
+        print("No valid schedule was generated. Current schedule:")
+        print(schedule)
 
 
 if __name__ == '__main__':
