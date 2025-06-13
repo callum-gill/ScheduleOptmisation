@@ -34,35 +34,43 @@ class SchedulingEnv(gym.Env):
 
         # Observation: current student info (scaled)
         self.observation_space = spaces.Box(
-            low=0.0, high=1.0, shape=(4,), dtype=np.float32
+            low=0.0, high=1.0, shape=(27,), dtype=np.float32
         )
+        self.last_obs = []
 
         self.schedule = []
 
     def reset(self, **kwargs):
-        print("Env reset..................")
         self.steps = 0
         self.schedule = []
         self.current_student_index = 0
+        self.last_obs = []
         return self.get_obs(), {}
 
     def get_obs(self):
+        if self.current_student_index >= len(self.student_ids):
+            return np.zeros(self.observation_space.shape, dtype=np.float32)
+
         student_id = self.student_ids[self.current_student_index]
         student = self.students[self.students["Student_ID"] == student_id].iloc[0]
+        instrument = student["Instrument"]
 
-        student_skill = (
-            1 if student["Skill_Level"] == "Beginner"
-            else 2 if student["Skill_Level"] == "Intermediate"
-            else 3
-        ) / 3
-
-        lessons_taken = len([l for l in self.schedule if l[1] == student_id])
-        obs = np.array([
-            self.student_mapping[student_id] / MAX_STUDENTS,
-            student_skill,
-            student["Lessons_Per_Week"] / 5,  # normalize if needed
-            lessons_taken / max(1, student["Lessons_Per_Week"]),
+        # Teacher compatibility mask (binary vector)
+        teacher_mask = np.array([
+            1.0 if instrument in t_instruments else 0.0
+            for t_instruments in self.teachers["Instruments"]
         ], dtype=np.float32)
+
+        # Binary vector of scheduled students (global state)
+        scheduled_mask = np.zeros(len(self.student_ids), dtype=np.float32)
+        for lesson in self.schedule:
+            student_idx = self.student_mapping[lesson[1]]
+            scheduled_mask[student_idx] = 1.0
+
+        obs = np.concatenate([
+            teacher_mask,
+            scheduled_mask
+        ])
 
         return obs
 
@@ -74,7 +82,7 @@ class SchedulingEnv(gym.Env):
         if teacher_idx >= len(self.teacher_ids) or \
            room_idx >= len(self.room_ids) or \
            self.current_student_index >= len(self.student_ids):
-            return self.get_obs(), -1.0, True, False, {"error": "index out of bounds"}
+            return self.last_obs, -1.0, True, False, {"error": "index out of bounds"}
 
         teacher_id = self.teacher_ids[teacher_idx]
         student_id = self.student_ids[self.current_student_index]
@@ -86,6 +94,7 @@ class SchedulingEnv(gym.Env):
 
         if self._is_valid_action(teacher_id, student_id, room_id, time_slot):
             lesson = (teacher_id, student_id, room_id, time_slot)
+            print(action)
 
             if lesson not in self.schedule:
                 self.current_student_index += 1
@@ -106,12 +115,6 @@ class SchedulingEnv(gym.Env):
                     print("📌 First time student scheduled")
                     reward += 2.0
 
-                student_required_lessons = self.students[self.students["Student_ID"] == student_id].iloc[0][
-                    "Lessons_Per_Week"]
-                if len(prev_student_lessons) < student_required_lessons:
-                    print("📈 Progress toward lesson goal")
-                    reward += 1.0
-
                 if not prev_pair_exists:
                     print("👥 New teacher-student pair")
                     reward += 0.5
@@ -123,20 +126,13 @@ class SchedulingEnv(gym.Env):
             reward -= 10.0
             info["error"] = "invalid action"
 
-        # Check if student needs more lessons
-        student_required = self.students[self.students["Student_ID"] == student_id].iloc[0]["Lessons_Per_Week"]
-        lessons_taken = len([l for l in self.schedule if l[1] == student_id])
-
-        if lessons_taken >= student_required:
-            self.current_student_index += 1  # Move to next student
-
-        all_scheduled = self._all_students_scheduled()
+        all_scheduled = len(set(l[1] for l in self.schedule)) == len(self.student_ids)
         done = self.steps >= self.max_steps or all_scheduled
         truncated = self.steps >= self.max_steps
 
         if all_scheduled:
             print("✅ All student scheduled")
-            reward += 5.0  # Bonus for finishing
+            reward += 5.0
 
         unique_students = len(set(l[1] for l in self.schedule))
         info["coverage"] = unique_students / len(self.student_ids)
@@ -149,11 +145,8 @@ class SchedulingEnv(gym.Env):
     def _is_valid_action(self, teacher_id, student_id, room_id, time_slot):
         teacher = self.teachers[self.teachers["Teacher_ID"] == teacher_id].iloc[0]
         student = self.students[self.students["Student_ID"] == student_id].iloc[0]
-        room = self.rooms[self.rooms["Room_ID"] == room_id].iloc[0]
 
         if student["Instrument"] not in teacher["Instruments"]:
-            return False
-        if student["Instrument"] not in room["Equipment"]:
             return False
 
         if any(
@@ -166,23 +159,14 @@ class SchedulingEnv(gym.Env):
         ):
             return False
 
-        student_lessons = [l for l in self.schedule if l[1] == student_id]
-        if len(student_lessons) >= student["Lessons_Per_Week"]:
-            return False
-
-        teacher_lessons = [l for l in self.schedule if l[0] == teacher_id]
-        if len(teacher_lessons) * 0.5 >= teacher["Max_Hours_Per_Week"]:
-            return False
-
         return True
-
-    def _all_students_scheduled(self):
-        scheduled_students = set(l[1] for l in self.schedule)
-        all_students = set(self.students["Student_ID"])
-        return all_students.issubset(scheduled_students)
 
     def decode_action(self, action):
         teacher_idx, room_idx, timeslot = action
+
+        if teacher_idx > len(self.teacher_ids) or room_idx > len(self.room_ids):
+            return []
+
         teacher_id = self.teacher_ids[teacher_idx]
         room_id = self.room_ids[room_idx]
         student_id = self.student_ids[self.current_student_index]

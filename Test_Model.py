@@ -1,5 +1,7 @@
 ﻿import pandas as pd
 from stable_baselines3 import PPO
+
+import config
 from RLModel import SchedulingEnv
 
 
@@ -22,7 +24,15 @@ def test_model():
     done = False
 
     while not done:
-        action, _ = model.predict(obs, deterministic=True)
+        action, _ = model.predict(obs, deterministic=False)
+
+        teacher_idx, room_idx, time_slot = action
+
+        if teacher_idx >= config.MAX_TEACHERS or room_idx >= config.MAX_ROOMS:
+            print("⚠️ Out of bounds, skipping action\n"
+                  f"Teacher Index: {teacher_idx}"
+                  f"Room Index: {room_idx}")
+            continue
 
         decoded = test_env.decode_action(action)
         print("Decoded action:", decoded)
