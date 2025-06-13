@@ -77,14 +77,18 @@ def generate_train_data():
         "Room_ID": [f"R{i:02d}" for i in range(1, MAX_ROOMS + 1)],
     })
 
+    times = pd.DataFrame(time_slots, columns=["Time Slot"])
+
 
     print("Teachers:\n", teachers.head())
     print("\nStudents:\n", students.head())
     print("\nRooms:\n", rooms.head())
+    print("\nTimes:\n", times.head())
 
     teachers.to_csv("teachers.csv", index=False)
     students.to_csv("students.csv", index=False)
     rooms.to_csv("rooms.csv", index=False)
+    times.to_csv("times.csv", index=False)
 
 
 def main():

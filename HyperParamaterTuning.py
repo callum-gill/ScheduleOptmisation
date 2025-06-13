@@ -10,6 +10,7 @@ from TrainingLogger import TrainingLoggerCallback
 teachers = pd.read_csv("teachers.csv")
 students = pd.read_csv("students.csv")
 rooms = pd.read_csv("rooms.csv")
+times = pd.read_csv("times.csv")
 
 # Define the objective function for Bayesian Optimization
 def objective(trial):
@@ -19,21 +20,19 @@ def objective(trial):
     clip_range = trial.suggest_float("clip_range", 0.1, 0.9)  # Updated from suggest_uniform
     ent_coef = trial.suggest_float("ent_coef", 1e-4, 0.1, log=True)  # Updated from suggest_loguniform
 
-    # Create environment
-    env = SchedulingEnv(teachers, students, rooms)
-    vec_env = make_vec_env(lambda: env, n_envs=1)
+    print("Setting up model...")
+    env = make_vec_env(lambda: SchedulingEnv(teachers, students, rooms, times), n_envs=1)
 
-    # Initialize PPO with suggested hyperparameters
     model = PPO(
-        "MultiInputPolicy",
-        vec_env,
-        verbose=0,  # Reduce verbosity to speed up optimization
+        "MlpPolicy", env,
+        verbose=1,
         device="auto",
         learning_rate=learning_rate,
         gamma=gamma,
         n_steps=n_steps,
         clip_range=clip_range,
-        ent_coef=ent_coef
+        ent_coef=ent_coef,
+        batch_size=2048
     )
 
     # Train for a small number of timesteps to evaluate performance
@@ -69,10 +68,9 @@ def main():
     print("Best hyperparameters found:", best_params)
 
     # Train final model with optimal hyperparameters
-    env = SchedulingEnv(teachers, students, rooms)
-    vec_env = make_vec_env(lambda: env, n_envs=1)
+    env = SchedulingEnv(teachers, students, rooms, times)
 
-    model = PPO("MultiInputPolicy", vec_env, verbose=1, device="auto", **best_params)
+    model = PPO("MultiInputPolicy", env, verbose=1, device="auto", **best_params)
 
     log_callback = TrainingLoggerCallback(log_dir="hyper_paramater_training_logs.csv")
     model.learn(total_timesteps=100000, callback=log_callback)

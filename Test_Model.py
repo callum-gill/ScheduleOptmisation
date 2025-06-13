@@ -10,9 +10,10 @@ def test_model():
     teachers = pd.read_csv("teachers.csv")
     students = pd.read_csv("students.csv")
     rooms = pd.read_csv("rooms.csv")
+    times = pd.read_csv("times.csv")
 
     print("Initializing test environment...")
-    test_env = SchedulingEnv(teachers, students, rooms)
+    test_env = SchedulingEnv(teachers, students, rooms, times)
 
     print("Loading trained model...")
     model = PPO.load("scheduling_rl_model")

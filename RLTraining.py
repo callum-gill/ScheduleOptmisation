@@ -12,9 +12,10 @@ def main():
     teachers = pd.read_csv("teachers.csv")
     students = pd.read_csv("students.csv")
     rooms = pd.read_csv("rooms.csv")
+    times = pd.read_csv("times.csv")
 
     print("Setting up model...")
-    env = make_vec_env(lambda: SchedulingEnv(teachers, students, rooms), n_envs=1)
+    env = make_vec_env(lambda: SchedulingEnv(teachers, students, rooms, times), n_envs=1)
 
     model = PPO(
         "MlpPolicy", env,

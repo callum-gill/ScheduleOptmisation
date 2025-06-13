@@ -4,12 +4,13 @@ from gymnasium import spaces
 from config import MAX_TEACHERS, MAX_ROOMS, MAX_STUDENTS, TIME_SLOTS
 
 class SchedulingEnv(gym.Env):
-    def __init__(self, teachers_df, students_df, rooms_df, max_steps=1000, target_lessons=None):
+    def __init__(self, teachers_df, students_df, rooms_df, times_df, max_steps=1000, target_lessons=None):
         super(SchedulingEnv, self).__init__()
 
         self.teachers = teachers_df.reset_index(drop=True)
         self.students = students_df.reset_index(drop=True)
         self.rooms = rooms_df.reset_index(drop=True)
+        self.times = times_df.reset_index(drop=True)
 
         self.max_steps = max_steps
         self.target_lessons = target_lessons or len(self.students)
@@ -20,6 +21,7 @@ class SchedulingEnv(gym.Env):
         self.teacher_ids = self.teachers["Teacher_ID"].tolist()
         self.student_ids = self.students["Student_ID"].tolist()
         self.room_ids = self.rooms["Room_ID"].tolist()
+        self.time_slots = self.times["Time Slot"].tolist()
 
         self.teacher_mapping = {tid: idx for idx, tid in enumerate(self.teacher_ids)}
         self.student_mapping = {sid: idx for idx, sid in enumerate(self.student_ids)}
@@ -81,19 +83,21 @@ class SchedulingEnv(gym.Env):
         # Validate indexes
         if teacher_idx >= len(self.teacher_ids) or \
            room_idx >= len(self.room_ids) or \
-           self.current_student_index >= len(self.student_ids):
+           self.current_student_index >= len(self.student_ids) or \
+            time_slot >= len(self.time_slots):
             return self.last_obs, -1.0, True, False, {"error": "index out of bounds"}
 
         teacher_id = self.teacher_ids[teacher_idx]
         student_id = self.student_ids[self.current_student_index]
         room_id = self.room_ids[room_idx]
+        time = self.time_slots[time_slot]
 
         reward = 0
         new_lesson = None
         info = {}
 
         if self._is_valid_action(teacher_id, student_id, room_id, time_slot):
-            lesson = (teacher_id, student_id, room_id, time_slot)
+            lesson = (teacher_id, student_id, room_id, time)
             print(action)
 
             if lesson not in self.schedule:
@@ -164,10 +168,11 @@ class SchedulingEnv(gym.Env):
     def decode_action(self, action):
         teacher_idx, room_idx, timeslot = action
 
-        if teacher_idx > len(self.teacher_ids) or room_idx > len(self.room_ids):
+        if teacher_idx > len(self.teacher_ids) or room_idx > len(self.room_ids) or timeslot > len(self.time_slots):
             return []
 
         teacher_id = self.teacher_ids[teacher_idx]
         room_id = self.room_ids[room_idx]
         student_id = self.student_ids[self.current_student_index]
-        return teacher_id, student_id, room_id, timeslot
+        time_slot = self.time_slots[timeslot]
+        return teacher_id, student_id, room_id, time_slot
