@@ -61,7 +61,7 @@ def main(filename):
         plt.legend()
 
     plt.tight_layout()
-    plt.show()
+    plt.savefig("training_plots.png")
 
 if __name__ == '__main__':
     fileNameOption = input("Enter 1 for training_logs.csv and 2 for hyper_paramater_training_logs.csv")

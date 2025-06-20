@@ -21,11 +21,11 @@ def main():
         "MlpPolicy", env,
         verbose=1,
         device="auto",
-        learning_rate=1e-4,
-        gamma=0.99,
-        n_steps=2048,
-        clip_range=0.2,
-        ent_coef=0.05,
+        learning_rate=0.0030353263270070634,
+        gamma=0.20010966437854416,
+        n_steps=512,
+        clip_range=0.3612469628098453,
+        ent_coef=0.000343079749565955,
         batch_size=2048
     )
 
